@@ -28,6 +28,7 @@ namespace slideshow\Controller\Show;
 
 use Canopy\Request;
 use slideshow\Factory\ShowFactory;
+use slideshow\Factory\SlideFactory;
 use slideshow\View\ShowView;
 
 class Admin extends Base
@@ -90,9 +91,21 @@ class Admin extends Base
         return 'viewHtmlCommand empty';
     }
 
-    protected function deleteCommand(Request $request)
+    protected function deleteSlideShowDeleteCommand(Request $request)
     {
-        $this->factory->delete($this->id);
+        $vars = $request->getRequestVars();
+        $this->factory->deleteSlideShow($vars['id']);
+    }
+
+    protected function deleteslideDeleteCommand(Request $request)
+    {
+      $vars = $request->getRequestVars();
+      $slideNum = intval($vars['slideNum']);
+      $showId = intval($vars['id']);
+
+      $showData = $this->editJsonCommand($request);
+      $factory = new SlideFactory();
+      return $factory->deleteSlide($showId, $slideNum, $showData);
     }
 
     protected function putCommand(Request $request)
@@ -105,6 +118,11 @@ class Admin extends Base
     {
         $shows = $this->factory->getShows();
         return json_encode($shows);
+    }
+
+    protected function getShowGetCommand(Request $request)
+    {
+
     }
 
     protected function getJsonView($data, \Canopy\Request $request)

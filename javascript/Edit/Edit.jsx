@@ -4,6 +4,7 @@ import EditView from './EditView.jsx'
 import NavBar from './NavBar.jsx'
 import SlidesView from './SlidesView.jsx'
 import Show from '../Resources/Show.js'
+import update from 'immutability-helper';
 
 export default class Edit extends Component {
   constructor() {
@@ -68,7 +69,7 @@ export default class Edit extends Component {
       type: 'GET',
       dataType: 'json',
       success: function (data) {
-
+        console.log(data)
         let loaded = data['slides']
 
         if (loaded[this.state.currentSlide] != undefined) {
@@ -113,16 +114,24 @@ export default class Edit extends Component {
       let copy = [...this.state.content]
       copy[0]['stack'] = []
       this.setState({content: copy})
+      this.save();
     } else {
-      let tempContent = this.state.content
-      tempContent.splice(slideNum, 1)
-      // If the first slide needs to be deleted but the slideshow
-      // already has multiple slides, we can safely delete the first slide.
-      let cslide = (slideNum == 0) ? 0 : slideNum - 1
-      this.setState({
-        content: tempContent,
-        currentSlide: cslide
-      })
+      $.ajax({
+        url: './slideshow/Show/deleteslide/?id=' + window.sessionStorage.getItem('id') + '&slideNum=' + slideNum,
+        data: {slideNumber: slideNum},
+        type: 'delete',
+        success: function() {
+          // If the first slide needs to be deleted but the slideshow
+          // already has multiple slides, we can safely delete the first slide.
+          let cslide = (slideNum == 0) ? 0 : slideNum - 1
+          this.load()
+          this.setState({currentSlide: cslide})
+        }.bind(this),
+        error: function(req, err) {
+          alert("Failed to delete slide " + slideNum + " from slideshow " + window.sessionStorage.getItem('id'))
+          console.error(req, err.toString());
+        }.bind(this)
+      });
     }
   }
 
@@ -203,6 +212,7 @@ export default class Edit extends Component {
   }
 
   render() {
+    console.log(this.state.content)
     return (
       <div>
         <NavBar

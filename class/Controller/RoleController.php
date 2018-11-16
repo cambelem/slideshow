@@ -96,6 +96,7 @@ abstract class RoleController
     protected function loadRequestId(Request $request)
     {
         $id = $request->shiftCommand();
+
         if (!is_numeric($id)) {
             throw new \slideshow\Exception\MissingRequestId($id);
         }
@@ -197,14 +198,21 @@ abstract class RoleController
 
     public function delete(Request $request)
     {
-        $this->loadRequestId($request);
+      // \var_dump($request);
+        //$this->loadRequestId($request);
 
-        if (!method_exists($this, 'deleteCommand')) {
-            throw new BadCommand('deleteCommand');
+
+        $command = $request->shiftCommand();
+        if (empty($command)) {
+            $method_name = 'deleteCommand';
+        } else {
+            $method_name = $command . 'DeleteCommand';
+        }
+        if (!method_exists($this, $method_name)) {
+            throw new BadCommand($method_name);
         }
 
-        $content = $this->deleteCommand($request);
-
+        $content = $this->$method_name($request);
         return $this->jsonResponse($content);
     }
 

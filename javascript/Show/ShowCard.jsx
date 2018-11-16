@@ -62,7 +62,7 @@ export default class ShowCard extends Component {
  deleteShow() {
    // Call by ajax - demo purposes only
    $.ajax({
-     url: './slideshow/Show/' + this.state.id,
+     url: './slideshow/Show/deleteSlideShow/?id=' + this.state.id,
      type: 'delete',
      dataType: 'json',
      success: function() {

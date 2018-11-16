@@ -18,7 +18,9 @@
 
 namespace slideshow\Factory;
 
-use slideshow\Resource\SlideResource as Resource;
+use slideshow\Resource\ShowResource as Resource;
+// TODO: This is all wonky, since we're saving everything in the slideshow..
+//use slideshow\Resource\SlideResource as Resource;
 use phpws2\Database;
 use Canopy\Request;
 
@@ -33,7 +35,7 @@ class SlideFactory extends Base
     }
 
     /**
-     * 
+     *
      * @param integer $id
      * @return \slideshow\Resource\SlideResource
      */
@@ -138,15 +140,17 @@ class SlideFactory extends Base
         return $slide->id;
     }
 
-    public function delete($slideId)
+    public function deleteSlide($showId, $slideId, $showData)
     {
-        $slide = $this->load($slideId);
-        self::deleteResource($slide);
-        $sortable = new \phpws2\Sortable('ss_slide', 'sorting');
-        $sortable->setAnchor('showId', $slide->showId);
-        $sortable->reorder();
+        //var_dump($showData['slides']);
+        $editedShowData = array_slice($showData['slides'], $slideId + 1);
 
-        $this->deleteImageDirectory($slide);
+        $resource = $this->load($showId);
+        $resource->content = json_encode($editedShowData);
+
+        // Save the updated resource to the Database
+        $this->saveResource($resource);
+        return true;
     }
 
     public function deleteImageDirectory($slide)
@@ -156,7 +160,7 @@ class SlideFactory extends Base
     }
 
     /**
-     * 
+     *
      * @param slideshow\Resource\SlideResource $slide
      */
     public function createImageDirectory($slide)

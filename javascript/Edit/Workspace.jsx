@@ -52,7 +52,17 @@ export default class Workspace extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.content != undefined) {
+      this.saveEditorState()
+      if (nextProps.content != this.props.content || nextProps.currentSlide !== this.props.currentSlide) {
+        this.loadEditorState(this.props.content)
+      }
+    }
+  }
+
   componentDidUpdate(prevProps) {
+    console.log(prevProps)
     if (this.props.content != undefined) {
       this.saveEditorState()
       if (prevProps.content != this.props.content || prevProps.currentSlide !== this.props.currentSlide) {

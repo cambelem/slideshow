@@ -137,6 +137,7 @@ class ShowFactory extends Base
       $q = $pdo->prepare($sql);
       $q->execute(array('showId'=>$showId));
       $data = $q->fetchColumn(0);
+      //var_dump($data);
       return json_decode($data);
     }
 
@@ -158,14 +159,9 @@ class ShowFactory extends Base
         return $template->get();
     }
 
-    public function deleteSlides($showId)
-    {
-        $db = Database::getDB();
-    }
 
-    public function delete($showId)
+    public function deleteSlideShow($showId)
     {
-        $this->deleteSlides($showId);
         self::deleteResource($this->load($showId));
         return true;
     }
